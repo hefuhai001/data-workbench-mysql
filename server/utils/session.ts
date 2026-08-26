@@ -1,9 +1,10 @@
 import type { Buffer } from 'node:buffer'
 
 // 仅在 Nitro 进程内存中保存解锁后的 AES 密钥，不落盘
-export const session: { masterKey: Buffer | null; unlocked: boolean } = {
+export const session: { masterKey: Buffer | null; unlocked: boolean; currentConnectionId: string | null } = {
   masterKey: null,
-  unlocked: false
+  unlocked: false,
+  currentConnectionId: null
 }
 
 export function assertUnlocked(): Buffer {
