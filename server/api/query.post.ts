@@ -18,6 +18,12 @@ export default defineEventHandler(async (event) => {
       return { type: 'affect', affectedRows: header.affectedRows, insertId: header.insertId }
     } finally { conn.end().catch(() => {}) }
   } catch (e: any) {
-    throw createError({ statusCode: 400, statusMessage: e?.sqlMessage || e?.message || String(e) })
+    if (e?.message === 'NO_CONNECTION' || e?.message === 'CONN_NOT_FOUND') {
+      throw createError({ statusCode: 400, statusMessage: e.message })
+    }
+    throw createError({
+      statusCode: e?.statusCode ?? (e?.errno !== undefined ? 400 : 500),
+      statusMessage: e?.sqlMessage || e?.message || String(e)
+    })
   }
 })
