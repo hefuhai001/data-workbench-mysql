@@ -1,0 +1,17 @@
+services:
+  workbench:
+    build: .
+    container_name: data-workbench-mysql
+    ports:
+      - "3000:3000"
+    # 持久化应用数据（主密码哈希 + 已保存的 MySQL 连接），容器重建不丢失
+    volumes:
+      - workbench-data:/app/.data
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+
+volumes:
+  workbench-data:
