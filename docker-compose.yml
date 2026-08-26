@@ -1,5 +1,5 @@
 services:
-  workbench:
+  app:
     build: .
     container_name: data-workbench-mysql
     restart: unless-stopped

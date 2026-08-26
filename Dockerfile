@@ -18,6 +18,11 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 
+# 移除非生产依赖（devDependencies），只给运行阶段保留最小 node_modules。
+# --ignore-scripts：prune 会重跑根项目 postinstall(nuxt prepare) 导致失败，故跳过脚本。
+# 不影响 native 模块——better-sqlite3 的二进制已在构建阶段编译完成，直接复用。
+RUN pnpm prune --prod --ignore-scripts
+
 # ---- 运行阶段 ----
 # 原生模块（better-sqlite3）无法被 Nitro 打包，直接复用构建阶段已编译好的 node_modules，
 # 避免在运行镜像重复编译并省去编译工具链
