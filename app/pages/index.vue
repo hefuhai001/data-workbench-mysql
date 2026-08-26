@@ -23,8 +23,10 @@ function onSelectTable(t: { database: string; name: string }) {
       <div v-if="activeTab === 'conn'">
         <ConnectionPanel @changed="showConnPanel = !showConnPanel" />
       </div>
-      <div v-else-if="activeTab === 'data'">
-        <p class="text-slate-400 text-sm">数据浏览：扩展到对象树与数据网格（后续任务）。当前选中表：{{ selectedTable ? selectedTable.database + '.' + selectedTable.name : '未选择' }}</p>
+      <div v-else-if="activeTab === 'data'" class="grid gap-4 lg:grid-cols-[280px_1fr]">
+        <ObjectBrowser @select-table="onSelectTable" />
+        <DataGrid v-if="selectedTable" :database="selectedTable.database" :table="selectedTable.name" />
+        <p v-else class="text-slate-400 text-sm self-start">在左侧选择一张表查看数据。</p>
       </div>
       <div v-else>
         <p class="text-slate-400 text-sm">SQL 控制台（后续任务填充）。</p>
