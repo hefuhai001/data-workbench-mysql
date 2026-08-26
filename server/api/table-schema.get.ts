@@ -1,0 +1,23 @@
+import { currentTarget } from '../utils/connect'
+import { openMysql } from '../utils/mysql'
+
+export default defineEventHandler(async (event) => {
+  const query = getQuery<{ database?: string; table?: string }>(event)
+  const { database, table } = query
+  if (!database || !table) throw createError({ statusCode: 400, statusMessage: '缺 database/table' })
+  try {
+    const { target } = await currentTarget()
+    target.database = database
+    const conn = await openMysql(target)
+    try {
+      const [cols] = await conn.query(
+        `SELECT column_name AS columnName, data_type AS dataType, column_key AS columnKey, is_nullable AS isNullable, column_default AS columnDefault FROM information_schema.columns WHERE table_schema = ? AND table_name = ? ORDER BY ordinal_position`,
+        [database, table]
+      )
+      const primaryKey = (cols as any[]).filter(c => c.columnKey === 'PRI').map(c => c.columnName)
+      return { columns: cols, primaryKey }
+    } finally { conn.end().catch(() => {}) }
+  } catch (e: any) {
+    throw createError({ statusCode: e?.statusCode ?? (e?.errno !== undefined ? 400 : 500), statusMessage: e?.sqlMessage || e?.message || String(e) })
+  }
+})
