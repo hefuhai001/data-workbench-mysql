@@ -1,4 +1,4 @@
-import { createConnection, type Connection, type ConnectionConfig } from 'mysql2/promise'
+import { createConnection, type Connection } from 'mysql2/promise'
 
 export interface MysqlTarget {
   host: string
@@ -9,7 +9,7 @@ export interface MysqlTarget {
 }
 
 export async function openMysql(cfg: MysqlTarget): Promise<Connection> {
-  const connConfig: ConnectionConfig = {
+  return createConnection({
     host: cfg.host,
     port: cfg.port,
     user: cfg.user,
@@ -17,8 +17,7 @@ export async function openMysql(cfg: MysqlTarget): Promise<Connection> {
     database: cfg.database || undefined,
     connectTimeout: 8000,
     multipleStatements: true
-  }
-  return createConnection(connConfig)
+  })
 }
 
 export async function testConnection(cfg: MysqlTarget): Promise<{ ok: boolean; message: string }> {

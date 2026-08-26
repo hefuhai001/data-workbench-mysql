@@ -6,6 +6,6 @@ export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
   const row = sqlite.prepare('SELECT id FROM connections WHERE id = ?').get(id) as { id: string } | undefined
   if (!row) throw createError({ statusCode: 404, statusMessage: '连接不存在' })
-  session.currentConnectionId = id
+  session.currentConnectionId = id ?? null
   return { ok: true }
 })

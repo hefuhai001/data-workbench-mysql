@@ -10,10 +10,10 @@ export default defineEventHandler(async (event) => {
     if (database) target.database = database
     const conn = await openMysql(target)
     try {
-      const [result] = await conn.query(sql)
+      const raw = (await conn.query(sql)) as unknown[]
+      let rs: any = raw[0]
       // 多语句结果会嵌套（数组的数组），仅取首个结果集展示避免结构错乱
-      let rs = result
-      if (Array.isArray(rs) && rs.length && Array.isArray(rs[0])) rs = result[0]
+      if (Array.isArray(rs) && rs.length && Array.isArray(rs[0])) rs = rs[0]
       if (Array.isArray(rs)) {
         return { type: 'select', rows: rs, rowCount: rs.length }
       }
