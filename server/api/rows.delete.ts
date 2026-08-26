@@ -1,7 +1,3 @@
-import { currentTarget } from '../utils/connect'
-import { openMysql } from '../utils/mysql'
-import { esc } from '../utils/escape'
-
 export default defineEventHandler(async (event) => {
   const { database, table, idCols, idVals } = await readBody(event)
   if (!database || !table || !Array.isArray(idCols) || !Array.isArray(idVals) || idCols.length === 0) {

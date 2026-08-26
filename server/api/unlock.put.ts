@@ -1,7 +1,3 @@
-import { assertUnlocked, session } from '../utils/session'
-import { verifyPassword, hashPassword, createKey, encryptSecret, decryptSecret } from '../utils/crypto'
-import { sqlite } from '../utils/db'
-
 export default defineEventHandler(async (event) => {
   const oldKey = assertUnlocked()
   const { oldPassword, newPassword } = await readBody(event)

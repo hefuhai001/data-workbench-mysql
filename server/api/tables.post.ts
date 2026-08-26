@@ -1,7 +1,3 @@
-import { currentTarget } from '../utils/connect'
-import { openMysql } from '../utils/mysql'
-import { esc } from '../utils/escape'
-
 export default defineEventHandler(async (event) => {
   const { database, name, action } = await readBody(event)
   if (!database || !name) throw createError({ statusCode: 400, statusMessage: '缺参数' })

@@ -1,6 +1,3 @@
-import { currentTarget } from '../utils/connect'
-import { openMysql } from '../utils/mysql'
-
 export default defineEventHandler(async (event) => {
   const query = getQuery<{ database?: string; table?: string }>(event)
   const { database, table } = query

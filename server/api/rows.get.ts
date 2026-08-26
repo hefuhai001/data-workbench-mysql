@@ -1,7 +1,3 @@
-import { currentTarget } from '../utils/connect'
-import { openMysql } from '../utils/mysql'
-import { esc } from '../utils/escape'
-
 export default defineEventHandler(async (event) => {
   // GET 请求下 h3 的 readBody(=>readRawBody) 会 assertMethod 拒绝 GET（405），故读取 query 参数
   const query = getQuery<{ database?: string; table?: string; page?: string; pageSize?: string; where?: string }>(event)

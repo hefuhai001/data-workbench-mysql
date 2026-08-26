@@ -1,7 +1,3 @@
-import { hashPassword, createKey } from '../utils/crypto'
-import { sqlite } from '../utils/db'
-import { session } from '../utils/session'
-
 export default defineEventHandler(async (event) => {
   const { password } = await readBody(event)
   if (!password || typeof password !== 'string' || password.length < 6) {

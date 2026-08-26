@@ -1,8 +1,3 @@
-import { assertUnlocked } from '../../../utils/session'
-import { decryptSecret } from '../../../utils/crypto'
-import { sqlite } from '../../../utils/db'
-import { testConnection } from '../../../utils/mysql'
-
 export default defineEventHandler(async (event) => {
   const key = assertUnlocked()
   const id = getRouterParam(event, 'id')

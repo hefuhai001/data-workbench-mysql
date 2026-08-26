@@ -1,6 +1,3 @@
-import { assertUnlocked, session } from '../../../utils/session'
-import { sqlite } from '../../../utils/db'
-
 export default defineEventHandler(async (event) => {
   assertUnlocked()
   const id = getRouterParam(event, 'id')

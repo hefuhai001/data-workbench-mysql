@@ -1,5 +1,3 @@
-import { currentTarget } from '../utils/connect'
-import { openMysql } from '../utils/mysql'
 import type { ResultSetHeader } from 'mysql2/promise'
 
 export default defineEventHandler(async (event) => {

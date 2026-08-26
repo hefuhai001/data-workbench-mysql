@@ -1,5 +1,3 @@
-import { withConnection } from '../utils/connect'
-
 export default defineEventHandler(async () => {
   try {
     return await withConnection(async (conn) => {
