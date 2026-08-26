@@ -1,3 +1,4 @@
+// 更新指定连接：仅覆盖传入的字段；密码留空则保持不变，否则用当前 AES 密钥重加密后回写。
 export default defineEventHandler(async (event) => {
   const key = assertUnlocked()
   const id = getRouterParam(event, 'id')

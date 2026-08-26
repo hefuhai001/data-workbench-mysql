@@ -1,3 +1,5 @@
+// SQL 控制台执行：对当前连接执行任意 SQL。查询语句返回 {type:'select',rows,rowCount}，
+// 写语句返回 {type:'affect',affectedRows,insertId}；多语句结果仅取首个结果集展示。
 import type { ResultSetHeader } from 'mysql2/promise'
 
 export default defineEventHandler(async (event) => {

@@ -1,3 +1,5 @@
+// 危险的表级操作：按 action 执行 DROP TABLE 或 TRUNCATE TABLE，仅用于用户显式删除/清空表，
+// 表名反引号转义，防止 SQL 注入破坏。
 export default defineEventHandler(async (event) => {
   const { database, name, action } = await readBody(event)
   if (!database || !name) throw createError({ statusCode: 400, statusMessage: '缺参数' })

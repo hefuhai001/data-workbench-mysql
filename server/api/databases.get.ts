@@ -1,3 +1,5 @@
+// 枚举当前连接的数据库列表：从 information_schema.schemata 查询，过滤掉 MySQL 系统库，
+// 供对象浏览器左侧树展示。建立短连接，用完即关闭。
 export default defineEventHandler(async () => {
   try {
     return await withConnection(async (conn) => {

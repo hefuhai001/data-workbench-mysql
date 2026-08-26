@@ -1,3 +1,5 @@
+// 解锁应用：校验用户输入的主密码与存储的 PBKDF2 哈希是否匹配，匹配则用同一 salt 派生 AES
+// 密钥写入内存 session 并置为已解锁，之后方可解密已保存的连接。
 export default defineEventHandler(async (event) => {
   const { password } = await readBody(event)
   if (!password || typeof password !== 'string') {

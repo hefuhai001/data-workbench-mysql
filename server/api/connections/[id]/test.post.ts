@@ -1,3 +1,4 @@
+// 连通性测试：解密该连接的密码后尝试建立 MySQL 连接并 ping，返回成功/失败信息，不持久化。
 export default defineEventHandler(async (event) => {
   const key = assertUnlocked()
   const id = getRouterParam(event, 'id')

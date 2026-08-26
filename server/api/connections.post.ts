@@ -1,3 +1,5 @@
+// 新增一个 MySQL 连接配置：校验必填字段，用 session 中的 AES 密钥对密码加密，
+// 存入 SQLite 的 connections 表，返回新连接的 id。密文（+认证标签）与 IV 分别存 ciphertext/iv。
 export default defineEventHandler(async (event) => {
   const key = assertUnlocked()
   const body = await readBody(event)

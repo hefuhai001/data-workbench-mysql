@@ -1,3 +1,5 @@
+// 首次初始化：设置主密码。校验长度后生成随机盐的 PBKDF2 哈希存入 app_master，
+// 并用该密码派生 AES 密钥写入内存会话直接进入已解锁状态（仅首次可用）。
 export default defineEventHandler(async (event) => {
   const { password } = await readBody(event)
   if (!password || typeof password !== 'string' || password.length < 6) {

@@ -1,3 +1,5 @@
+// 分页读取指定表的行数据：按 query 参数（database/table/page/pageSize/where）查询。
+// 关系返回 { rows, total }；where 为可选过滤片段，值通过参数绑定防注入，表名反引号转义。
 export default defineEventHandler(async (event) => {
   // GET 请求下 h3 的 readBody(=>readRawBody) 会 assertMethod 拒绝 GET（405），故读取 query 参数
   const query = getQuery<{ database?: string; table?: string; page?: string; pageSize?: string; where?: string }>(event)

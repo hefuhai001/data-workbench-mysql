@@ -1,3 +1,5 @@
+// 修改主密码：校验旧密码后生成新随机盐/哈希与密钥，先用旧密钥解密全部已保存连接，
+// 再用新密钥批量重加密回写（事务保证一致），最后更新主密码并刷新内存密钥。
 export default defineEventHandler(async (event) => {
   const oldKey = assertUnlocked()
   const { oldPassword, newPassword } = await readBody(event)
