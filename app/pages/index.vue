@@ -29,7 +29,7 @@ function onSelectTable(t: { database: string; name: string }) {
         <p v-else class="text-slate-400 text-sm self-start">在左侧选择一张表查看数据。</p>
       </div>
       <div v-else>
-        <p class="text-slate-400 text-sm">SQL 控制台（后续任务填充）。</p>
+        <SqlConsole />
       </div>
     </main>
   </div>
