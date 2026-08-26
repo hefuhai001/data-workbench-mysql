@@ -23,6 +23,9 @@ const editingIndex = ref(-1)
 const form = ref<Record<string, string>>({})
 const formError = ref('')
 
+// 新增表单仅对非自增列生成输入（自增主键/默认值列交由数据库处理）
+const addColumns = computed(() => schema.value.columns.filter(c => (c.extra || '').toLowerCase() !== 'auto_increment'))
+
 function buildQuery() {
   const p = new URLSearchParams({
     database: props.database,
@@ -68,7 +71,7 @@ function refresh() { loadSchema(); load() }
 function openAdd() {
   formError.value = ''
   const f: Record<string, string> = {}
-  for (const c of schema.value.columns) f[c.columnName] = ''
+  for (const c of addColumns.value) f[c.columnName] = ''
   form.value = f
   showAdd.value = true
 }
@@ -193,7 +196,7 @@ watch(() => [props.database, props.table], refresh)
   <UiModal v-if="showAdd" title="新增行" @close="showAdd = false">
     <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
       <UiInput
-        v-for="c in schema.columns"
+        v-for="c in addColumns"
         :key="c.columnName"
         :label="`${c.columnName} (${c.dataType}${c.isNullable === 'NO' ? ' *' : ''})`"
         v-model="form[c.columnName]"

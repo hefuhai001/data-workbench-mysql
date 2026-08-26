@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     const conn = await openMysql(target)
     try {
       const [cols] = await conn.query(
-        `SELECT column_name AS columnName, data_type AS dataType, column_key AS columnKey, is_nullable AS isNullable, column_default AS columnDefault FROM information_schema.columns WHERE table_schema = ? AND table_name = ? ORDER BY ordinal_position`,
+        `SELECT column_name AS columnName, data_type AS dataType, column_key AS columnKey, is_nullable AS isNullable, column_default AS columnDefault, extra FROM information_schema.columns WHERE table_schema = ? AND table_name = ? ORDER BY ordinal_position`,
         [database, table]
       )
       const primaryKey = (cols as any[]).filter(c => c.columnKey === 'PRI').map(c => c.columnName)
