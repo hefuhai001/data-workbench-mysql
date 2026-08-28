@@ -23,6 +23,7 @@ logs
 .env.*
 !.env.example
 docs/
+.superpowers/
 
 # 运行时生成的 SQLite 数据文件
 .data/
