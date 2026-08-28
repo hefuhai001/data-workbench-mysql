@@ -4,11 +4,10 @@ const emit = defineEmits<{ close: [] }>()
 </script>
 
 <template>
-  <!-- 底部弹出卡片式弹窗 -->
-  <div class="fixed inset-0 z-50 flex items-end justify-center bg-black/30 backdrop-blur-[2px] p-0 sm:items-center sm:p-5"
+  <!-- 页面居中弹窗 -->
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px] p-5"
     @click.self="emit('close')">
-    <div class="ios-card w-full max-w-md p-5 rounded-b-none rounded-t-2xl sm:rounded-2xl
-      animate-[ios-sheet_0.28s_cubic-bezier(0.32,0.72,0,1)]">
+    <div class="ios-card w-full max-w-md p-5 rounded-2xl animate-[ios-pop_0.22s_ease-out]">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-[16px] font-semibold text-ios-label">{{ title }}</h3>
         <button class="grid place-items-center size-7 rounded-full bg-ios-fill text-ios-secondary hover:text-ios-label active:scale-95 transition"
@@ -20,14 +19,14 @@ const emit = defineEmits<{ close: [] }>()
 </template>
 
 <style scoped>
-@keyframes ios-sheet {
+@keyframes ios-pop {
   from {
-    opacity: 0.5;
-    transform: translateY(24px);
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1) translateY(0);
   }
 }
 </style>

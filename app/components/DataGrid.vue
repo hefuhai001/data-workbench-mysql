@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{ database: string; table: string }>()
+const props = defineProps<{ database: string; table: string; connectionId?: string; title?: string }>()
 const api = useApi()
 
 const rows = ref<any[]>([])
@@ -33,13 +33,16 @@ function buildQuery() {
     page: String(page.value),
     pageSize: String(pageSize.value)
   })
+  if (props.connectionId) p.set('connectionId', props.connectionId)
   if (where.value.trim()) p.set('where', where.value)
   return p.toString()
 }
 
 async function loadSchema() {
   try {
-    const res = (await api.call(`/api/table-schema?database=${encodeURIComponent(props.database)}&table=${encodeURIComponent(props.table)}`)) as any
+    const q = new URLSearchParams({ database: props.database, table: props.table })
+    if (props.connectionId) q.set('connectionId', props.connectionId)
+    const res = (await api.call(`/api/table-schema?${q.toString()}`)) as any
     schema.value = { columns: res.columns || [], primaryKey: res.primaryKey || [] }
   } catch (e: any) {
     error.value = e?.data?.statusMessage || e?.message || String(e)
@@ -80,7 +83,7 @@ async function confirmAdd() {
   saving.value = true
   formError.value = ''
   try {
-    await api.call('/api/rows', { method: 'POST', body: { database: props.database, table: props.table, row: form.value } })
+    await api.call('/api/rows', { method: 'POST', body: { database: props.database, table: props.table, row: form.value, connectionId: props.connectionId } })
     showAdd.value = false
     page.value = 1
     await load()
@@ -108,7 +111,7 @@ async function confirmEdit() {
     const r = rows.value[editingIndex.value]
     const idCols = schema.value.primaryKey
     const idVals = idCols.map(pk => r[pk])
-    await api.call('/api/rows', { method: 'PUT', body: { database: props.database, table: props.table, row: form.value, idCols, idVals } })
+    await api.call('/api/rows', { method: 'PUT', body: { database: props.database, table: props.table, row: form.value, idCols, idVals, connectionId: props.connectionId } })
     showEdit.value = false
     await load()
   } catch (e: any) {
@@ -125,7 +128,7 @@ async function removeRow(r: any) {
   const idCols = schema.value.primaryKey
   const idVals = idCols.map(pk => r[pk])
   try {
-    await api.call('/api/rows', { method: 'DELETE', body: { database: props.database, table: props.table, idCols, idVals } })
+    await api.call('/api/rows', { method: 'DELETE', body: { database: props.database, table: props.table, idCols, idVals, connectionId: props.connectionId } })
     await load()
   } catch (e: any) {
     error.value = e?.data?.statusMessage || e?.message || String(e)
@@ -133,14 +136,14 @@ async function removeRow(r: any) {
 }
 
 onMounted(refresh)
-watch(() => [props.database, props.table], refresh)
+watch(() => [props.database, props.table, props.connectionId], refresh)
 </script>
 
 <template>
   <div class="ios-card">
     <!-- 标题栏 -->
     <div class="flex justify-between items-center px-4 h-12 border-b border-ios-sep">
-      <h3 class="text-[15px] font-semibold text-ios-label truncate">数据</h3>
+      <h3 class="text-[15px] font-semibold text-ios-label truncate">{{ title || '数据' }}</h3>
       <div class="flex items-center gap-2.5 shrink-0">
         <span class="text-xs text-ios-secondary whitespace-nowrap">共 {{ total }} 行</span>
         <UiButton

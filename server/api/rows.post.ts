@@ -1,11 +1,11 @@
-// 新增一行数据：接收 { database, table, row }，过滤值为空串的列后构造 INSERT（全空则触发默认值），
+// 新增一行数据：接收 { database, table, row, connectionId? }，过滤值为空串的列后构造 INSERT（全空则触发默认值），
 // 表名反引号转义、值参数绑定，用于数据网格的"新增行"。
 export default defineEventHandler(async (event) => {
-  const { database, table, row } = await readBody(event)
+  const { database, table, row, connectionId } = await readBody(event)
   if (!database || !table || !row) throw createError({ statusCode: 400, statusMessage: '缺参数' })
   const safeTable = esc(table)
   try {
-    const { target } = await currentTarget()
+    const { target } = connectionId ? await targetFor(connectionId) : await currentTarget()
     target.database = database
     const conn = await openMysql(target)
     try {

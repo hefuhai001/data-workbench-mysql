@@ -4,10 +4,9 @@ import { sqlite } from './db'
 import { openMysql, type MysqlTarget } from './mysql'
 import type { Connection } from 'mysql2/promise'
 
-export async function currentTarget(): Promise<{ target: MysqlTarget; database: string | null }> {
+export async function targetFor(connectionId: string): Promise<{ target: MysqlTarget; database: string | null }> {
   const key = assertUnlocked()
-  if (!session.currentConnectionId) throw new Error('NO_CONNECTION')
-  const row = sqlite.prepare('SELECT * FROM connections WHERE id = ?').get(session.currentConnectionId) as {
+  const row = sqlite.prepare('SELECT * FROM connections WHERE id = ?').get(connectionId) as {
     host: string; port: number; user: string; defaultDatabase: string | null; ciphertext: string; iv: string
   } | undefined
   if (!row) throw new Error('CONN_NOT_FOUND')
@@ -19,13 +18,19 @@ export async function currentTarget(): Promise<{ target: MysqlTarget; database: 
   return { target, database: row.defaultDatabase || null }
 }
 
+export async function currentTarget(): Promise<{ target: MysqlTarget; database: string | null }> {
+  if (!session.currentConnectionId) throw new Error('NO_CONNECTION')
+  return targetFor(session.currentConnectionId)
+}
+
 export async function currentConnection(): Promise<Connection> {
   const { target } = await currentTarget()
   return openMysql(target)
 }
 
-export async function withConnection<T>(fn: (conn: Connection) => Promise<T>): Promise<T> {
-  const conn = await currentConnection()
+// connectionId 可选：指定时按该连接建连（支持多连接浏览），缺省沿用当前连接
+export async function withConnection<T>(fn: (conn: Connection) => Promise<T>, connectionId?: string): Promise<T> {
+  const conn = connectionId ? await openMysql((await targetFor(connectionId)).target) : await currentConnection()
   try {
     return await fn(conn)
   } finally {

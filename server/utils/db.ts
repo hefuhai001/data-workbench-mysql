@@ -27,6 +27,11 @@ db.exec(`
     createdAt TEXT NOT NULL DEFAULT (datetime('now')),
     updatedAt TEXT NOT NULL DEFAULT (datetime('now'))
   );
+  CREATE TABLE IF NOT EXISTS notes (
+    key TEXT PRIMARY KEY,
+    note TEXT NOT NULL,
+    updatedAt TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 `)
 
 export const sqlite = db
