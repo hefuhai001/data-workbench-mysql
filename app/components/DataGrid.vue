@@ -26,6 +26,16 @@ const formError = ref('')
 // 新增表单仅对非自增列生成输入（自增主键/默认值列交由数据库处理）
 const addColumns = computed(() => schema.value.columns.filter(c => (c.extra || '').toLowerCase() !== 'auto_increment'))
 
+// 构建提交行：日期时间列统一规范化为 MySQL 可接受格式，避免 "2026-...T...Z" 报错
+function buildRow(cols: any[]): Record<string, string> {
+  const row: Record<string, string> = {}
+  for (const c of cols) {
+    const v = form.value[c.columnName]
+    row[c.columnName] = v === undefined ? '' : (isDateTimeType(c.dataType) ? normalizeDateTime(v) : v)
+  }
+  return row
+}
+
 function buildQuery() {
   const p = new URLSearchParams({
     database: props.database,
@@ -111,7 +121,7 @@ async function confirmEdit() {
     const r = rows.value[editingIndex.value]
     const idCols = schema.value.primaryKey
     const idVals = idCols.map(pk => r[pk])
-    await api.call('/api/rows', { method: 'PUT', body: { database: props.database, table: props.table, row: form.value, idCols, idVals, connectionId: props.connectionId } })
+    await api.call('/api/rows', { method: 'PUT', body: { database: props.database, table: props.table, row: buildRow(schema.value.columns), idCols, idVals, connectionId: props.connectionId } })
     showEdit.value = false
     await load()
   } catch (e: any) {
@@ -207,10 +217,11 @@ watch(() => [props.database, props.table, props.connectionId], refresh)
 
   <UiModal v-if="showAdd" title="新增行" @close="showAdd = false">
     <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-      <UiInput
+      <FieldInput
         v-for="c in addColumns"
         :key="c.columnName"
-        :label="`${c.columnName} (${c.dataType}${c.isNullable === 'NO' ? ' *' : ''})`"
+        :column="c"
+        :hint="c.isNullable === 'NO' ? '必填' : ''"
         v-model="form[c.columnName]"
       />
     </div>
@@ -223,10 +234,11 @@ watch(() => [props.database, props.table, props.connectionId], refresh)
 
   <UiModal v-if="showEdit" title="编辑行" @close="showEdit = false">
     <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-      <UiInput
+      <FieldInput
         v-for="c in schema.columns"
         :key="c.columnName"
-        :label="`${c.columnName} (${c.dataType}${hasPk && schema.primaryKey.includes(c.columnName) ? ' · 主键' : ''})`"
+        :column="c"
+        :hint="hasPk && schema.primaryKey.includes(c.columnName) ? '主键' : (c.isNullable === 'NO' ? '必填' : '')"
         v-model="form[c.columnName]"
       />
     </div>
