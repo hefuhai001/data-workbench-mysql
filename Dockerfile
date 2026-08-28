@@ -1,5 +1,5 @@
 # ---- 构建阶段 ----
-FROM node:22-bookworm-slim AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 
 # better-sqlite3 是原生模块，需 Python + make + g++ 源码编译
@@ -26,7 +26,7 @@ RUN pnpm prune --prod --ignore-scripts
 # ---- 运行阶段 ----
 # 原生模块（better-sqlite3）无法被 Nitro 打包，直接复用构建阶段已编译好的 node_modules，
 # 避免在运行镜像重复编译并省去编译工具链
-FROM node:22-bookworm-slim AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
