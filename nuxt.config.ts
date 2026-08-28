@@ -6,8 +6,12 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   app: {
     head: {
+      meta: [
+        { name: 'theme-color', content: '#007AFF' }
+      ],
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'manifest', href: '/manifest.webmanifest' }
       ]
     }
   },

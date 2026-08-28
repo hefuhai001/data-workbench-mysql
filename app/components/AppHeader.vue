@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // 顶部导航栏：品牌区 + 第二行展示点击生成的 tag 标签（可点击切换/关闭，滚轮可横向滚动）
-const { tabs, activeKey, activateKey, closeTab, sidebarOpen, loadTree } = useWorkbench()
+const { tabs, activeKey, activateKey, closeTab, sidebarOpen } = useWorkbench()
+const { canInstall, installed, install } = usePwaInstall()
 
 const tagRef = ref<HTMLElement | null>(null)
 
@@ -34,12 +35,29 @@ function onTagWheel(e: WheelEvent) {
 
       <div class="ml-auto flex items-center gap-1.5">
         <span class="hidden sm:inline text-xs text-ios-tertiary">MySQL</span>
-        <button class="grid place-items-center size-8 rounded-lg text-ios-secondary hover:bg-ios-fill" title="刷新连接树"
-          @click="loadTree">
+        <!-- PWA 安装应用：可安装时显示，点击弹出浏览器安装确认 -->
+        <button
+          v-if="canInstall"
+          class="flex items-center gap-1.5 h-8 px-2.5 rounded-lg bg-ios-blue text-white text-[13px] font-medium shadow-sm hover:opacity-90 active:scale-95 transition"
+          title="安装为应用"
+          @click="install"
+        >
           <svg class="size-4" viewBox="0 0 24 24" fill="none">
-            <path d="M20 11A8 8 0 106 15.3M4 13a8 8 0 1014-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
+          <span class="hidden sm:inline">安装应用</span>
         </button>
+        <!-- 已安装状态提示 -->
+        <span
+          v-else-if="installed"
+          class="flex items-center gap-1.5 h-8 px-2.5 rounded-lg text-ios-tertiary text-[13px]"
+          title="已安装"
+        >
+          <svg class="size-4" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12.5l4.5 4.5L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="hidden sm:inline">已安装</span>
+        </span>
       </div>
     </div>
 
