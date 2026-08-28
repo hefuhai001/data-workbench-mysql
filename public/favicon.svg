@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3EA6FF"/>
+      <stop offset="1" stop-color="#007AFF"/>
+    </linearGradient>
+  </defs>
+  <!-- iOS 风格圆角方块 + 数据库圆柱图标 -->
+  <rect x="3" y="3" width="58" height="58" rx="15" fill="url(#bg)"/>
+  <g fill="#fff">
+    <ellipse cx="32" cy="22" rx="13" ry="5.5"/>
+    <path d="M19 22v16c0 3.1 5.8 5.5 13 5.5s13-2.4 13-5.5V22z"/>
+    <ellipse cx="32" cy="38" rx="13" ry="5.5"/>
+  </g>
+</svg>
