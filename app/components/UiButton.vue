@@ -1,13 +1,18 @@
 <script setup lang="ts">
-defineProps<{ variant?: 'primary' | 'ghost' | 'danger' }>()
+withDefaults(defineProps<{ variant?: 'primary' | 'ghost' | 'danger' | 'soft'; size?: 'sm' | 'md' }>(), {
+  variant: 'ghost',
+  size: 'md'
+})
 </script>
 
 <template>
   <button :class="[
-    'px-3 py-1.5 rounded-lg text-sm font-medium transition disabled:opacity-50',
-    variant === 'primary' ? 'bg-blue-600 text-white hover:bg-blue-700'
-    : variant === 'danger' ? 'bg-red-600 text-white hover:bg-red-700'
-    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+    'ios-btn',
+    size === 'sm' ? 'px-3 py-1.5 text-[13px]' : 'px-4 py-2 text-sm',
+    variant === 'primary' ? 'ios-btn-primary'
+    : variant === 'danger' ? 'ios-btn-danger'
+    : variant === 'soft' ? 'ios-btn-soft'
+    : 'ios-btn-soft'
   ]">
     <slot />
   </button>

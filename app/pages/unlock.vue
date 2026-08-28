@@ -32,26 +32,29 @@ async function submit() {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-slate-100 p-4">
-    <div class="w-full max-w-sm bg-white rounded-xl shadow p-6 space-y-4">
-      <h1 class="text-xl font-semibold text-center text-slate-800">
-        {{ state === 'init' ? '设置主密码' : '解锁 Workbench' }}
-      </h1>
-      <p class="text-sm text-slate-500 text-center">
+  <div class="min-h-screen flex items-center justify-center bg-ios-bg p-4">
+    <div class="w-full max-w-sm ios-card p-7 space-y-4">
+      <div class="flex flex-col items-center gap-3">
+        <div class="grid place-items-center size-14 rounded-[16px] bg-ios-blue text-white text-xl shadow-lg shadow-ios-blue/25">DB</div>
+        <h1 class="text-lg font-semibold text-center text-ios-label">
+          {{ state === 'init' ? '设置主密码' : '解锁 Workbench' }}
+        </h1>
+      </div>
+      <p class="text-sm text-ios-secondary text-center leading-relaxed">
         {{ state === 'init' ? '首次使用，请设置主密码。其余密码将用其加密保存。' : '输入主密码以解密已保存的连接。' }}
       </p>
       <input
         v-model="password"
         type="password"
         placeholder="主密码"
-        class="w-full border border-slate-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+        class="ios-input"
         @keyup.enter="submit"
       />
-      <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+      <p v-if="error" class="text-sm text-ios-red text-center">{{ error }}</p>
       <button
         :disabled="loading"
         @click="submit"
-        class="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-medium py-2 rounded-lg"
+        class="w-full ios-btn ios-btn-primary !py-2.5 text-[15px] disabled:opacity-50"
       >
         {{ loading ? '请稍候…' : (state === 'init' ? '设置' : '解锁') }}
       </button>

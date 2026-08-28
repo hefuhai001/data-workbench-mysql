@@ -1,1 +1,236 @@
 @import "tailwindcss";
+
+/* =========================================================
+   iOS Design Tokens
+   ========================================================= */
+@theme {
+  /* 系统字体 */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "SF Pro Icons", "Helvetica Neue", "Segoe UI", Roboto, "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, "Menlo", Consolas,
+    "Liberation Mono", monospace;
+
+  /* iOS 色板 */
+  --color-ios-bg: #f2f2f7;          /* 分组背景 */
+  --color-ios-card: #ffffff;        /* 卡片 */
+  --color-ios-fill: #e9e9eb;        /* 分段控件/输入框底 */
+  --color-ios-fill2: #d9d9de;       /* 更深填充 */
+  --color-ios-blue: #007aff;        /* 系统蓝 */
+  --color-ios-blue-dark: #0060df;
+  --color-ios-red: #ff3b30;         /* 系统红 */
+  --color-ios-green: #34c759;       /* 系统绿 */
+  --color-ios-orange: #ff9500;      /* 系统橙 */
+  --color-ios-label: #1c1c1e;       /* 一级文字 */
+  --color-ios-secondary: #6d6d72;   /* 二级文字 */
+  --color-ios-tertiary: #aeaeb2;    /* 三级文字/占位 */
+  --color-ios-quaternary: #c7c7cc;  /* 分隔线 */
+  --color-ios-sep: rgba(60, 60, 67, 0.14);   /* iOS 分隔线 */
+  --color-ios-highlight: rgba(0, 122, 255, 0.08); /* 选中泛光 */
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-ios-bg);
+    color: var(--color-ios-label);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: rgba(0, 122, 255, 0.2);
+  }
+
+  button {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* =========================================================
+   滚动条（iOS 风格：细、圆角、自动隐藏）
+   ========================================================= */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.20) transparent;
+}
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.20);
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.30);
+}
+
+/* =========================================================
+   通用 iOS 组件
+   ========================================================= */
+
+/* Grouped 卡片容器 */
+.ios-card {
+  background-color: var(--color-ios-card);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 8px 28px rgba(0, 0, 0, 0.07);
+}
+
+/* Grouped 列表行：仅保留行间 hairline 分隔线 */
+.ios-row + .ios-row {
+  border-top: 1px solid var(--color-ios-sep);
+  margin-left: 0;
+}
+.ios-row + .ios-row::before {
+  /* iOS 行首缩进分隔线 */
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: var(--color-ios-sep);
+  pointer-events: none;
+}
+.ios-row {
+  position: relative;
+  margin-left: 16px;
+}
+.ios-row:last-child {
+  border-bottom: none;
+}
+
+/* Segmented 圆角分段控件 */
+.ios-segmented {
+  display: flex;
+  gap: 0;
+  padding: 3px;
+  background-color: var(--color-ios-fill);
+  border-radius: 9px;
+}
+.ios-segmented > button {
+  flex: 1;
+  text-align: center;
+  padding: 5px 14px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--color-ios-label);
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+.ios-segmented > button.active {
+  background-color: var(--color-ios-card);
+  color: var(--color-ios-label);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* iOS 系统按钮 */
+.ios-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  transition: transform 0.08s, filter 0.12s, background-color 0.15s;
+  user-select: none;
+}
+.ios-btn:active {
+  transform: scale(0.97);
+}
+.ios-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.ios-btn-primary {
+  background-color: var(--color-ios-blue);
+  color: #fff;
+}
+.ios-btn-primary:hover {
+  filter: brightness(1.06);
+}
+.ios-btn-danger {
+  background-color: var(--color-ios-red);
+  color: #fff;
+}
+.ios-btn-danger:hover {
+  filter: brightness(1.06);
+}
+.ios-btn-soft {
+  background-color: var(--color-ios-fill);
+  color: var(--color-ios-blue);
+  font-weight: 600;
+}
+.ios-btn-soft:hover {
+  background-color: var(--color-ios-fill2);
+}
+.ios-btn-plain {
+  color: var(--color-ios-blue);
+  background: transparent;
+}
+
+/* iOS 输入框 */
+.ios-input {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--color-ios-card);
+  border: none;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 15px;
+  color: var(--color-ios-label);
+  box-shadow: inset 0 0 0 1px rgba(60, 60, 67, 0.18);
+  transition: box-shadow 0.15s;
+  outline: none;
+}
+.ios-input::placeholder {
+  color: var(--color-ios-quaternary);
+}
+.ios-input:focus {
+  box-shadow: inset 0 0 0 3px rgba(0, 122, 255, 0.32),
+    inset 0 0 0 1px var(--color-ios-blue);
+}
+
+/* 侧边栏导航行 */
+.ios-sidebar-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-radius: 7px;
+  padding: 6px 8px;
+  font-size: 13.5px;
+  color: var(--color-ios-label);
+  transition: background-color 0.12s;
+  text-align: left;
+}
+.ios-sidebar-row:hover {
+  background-color: rgba(0, 0, 0, 0.035);
+}
+.ios-sidebar-row.active {
+  background-color: var(--color-ios-blue);
+  color: #fff;
+}
+.ios-sidebar-row.active .sub {
+  color: rgba(255, 255, 255, 0.85);
+}

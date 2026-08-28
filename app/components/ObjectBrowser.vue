@@ -4,6 +4,7 @@ const loading = ref(false)
 const dbs = ref<any[]>([])
 const expanded = ref<Record<string, boolean>>({})
 const tables = ref<Record<string, any[]>>({})
+const selected = ref<{ database: string; name: string } | null>(null)
 const emit = defineEmits<{ selectTable: [any] }>()
 
 async function load() {
@@ -19,40 +20,70 @@ async function toggle(db: any) {
   }
 }
 
+function select(db: string, t: any) {
+  selected.value = { database: db, name: t.name }
+  emit('selectTable', { database: db, name: t.name })
+}
+
 onMounted(load)
 defineExpose({ load })
 </script>
 
 <template>
-  <div class="bg-white rounded-xl border border-slate-200 p-3">
-    <div class="flex justify-between items-center mb-2">
-      <h3 class="font-semibold text-slate-700">对象</h3>
-      <button class="text-xs text-slate-400 hover:text-blue-600" @click="load">刷新</button>
+  <div class="ios-card">
+    <div class="flex items-center justify-between px-4 h-11 border-b border-ios-sep">
+      <h3 class="text-[15px] font-semibold text-ios-label">对象</h3>
+      <button
+        class="text-[13px] text-ios-blue active:opacity-60"
+        @click="load"
+      >刷新</button>
     </div>
-    <p v-if="loading" class="text-sm text-slate-400">加载中…</p>
-    <div v-else-if="!dbs.length" class="text-sm text-slate-400">未选择连接或无可浏览数据库。</div>
-    <div v-else class="space-y-0.5">
+
+    <p v-if="loading" class="px-4 py-6 text-sm text-ios-tertiary text-center">加载中…</p>
+    <p v-else-if="!dbs.length" class="px-4 py-6 text-sm text-ios-tertiary text-center">未选择连接或无可浏览数据库。</p>
+    <div v-else class="p-2 space-y-1 max-h-[68vh] overflow-y-auto">
       <div v-for="db in dbs" :key="db.name">
-        <button class="flex items-center gap-1 w-full text-left py-1 px-2 rounded hover:bg-slate-100 text-slate-700 text-sm" @click="toggle(db)">
-          <span>{{ expanded[db.name] ? '▾' : '▸' }}</span>
-          <span>🗄 {{ db.name }}</span>
+        <!-- 数据库行 -->
+        <button
+          class="ios-sidebar-row font-medium"
+          @click="toggle(db)"
+        >
+          <svg class="size-3.5 mr-1.5 text-ios-tertiary shrink-0 transition-transform duration-150"
+            :class="expanded[db.name] ? 'rotate-90' : ''"
+            viewBox="0 0 24 24" fill="none">
+            <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg class="size-4 mr-1.5 text-ios-orange shrink-0" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 3L2 8l10 5 10-5-10-5zm10 10.5L12 20 2 13.5V11l10 5 10-5v2.5z"/>
+          </svg>
+          <span class="truncate">{{ db.name }}</span>
         </button>
-        <div v-if="expanded[db.name]" class="ml-5 space-y-0.5">
+
+        <!-- 表/视图列表 -->
+        <div v-if="expanded[db.name]" class="ml-[14px] pl-[14px] space-y-0.5 border-l border-ios-sep">
           <button
             v-for="t in (tables[db.name] || []).filter((x: any) => x.type === 'BASE TABLE')"
             :key="'t' + t.name"
-            class="block w-full text-left text-sm text-slate-600 py-1 px-2 rounded hover:bg-blue-50"
-            @click="emit('selectTable', { database: db.name, name: t.name })"
+            class="ios-sidebar-row"
+            :class="selected?.database === db.name && selected?.name === t.name && 'active'"
+            @click="select(db.name, t)"
           >
-            表 {{ t.name }}
+            <svg class="size-3.5 mr-2 text-ios-blue shrink-0" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 5a2 2 0 012-2h4l2 2h8a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5z"/>
+            </svg>
+            <span class="truncate">{{ t.name }}</span>
           </button>
           <button
             v-for="v in (tables[db.name] || []).filter((x: any) => x.type !== 'BASE TABLE')"
             :key="'v' + v.name"
-            class="block w-full text-left text-sm text-slate-400 py-1 px-2"
-            @click="emit('selectTable', { database: db.name, name: v.name })"
+            class="ios-sidebar-row text-ios-secondary"
+            :class="selected?.database === db.name && selected?.name === v.name && 'active'"
+            @click="select(db.name, v)"
           >
-            视图 {{ v.name }}
+            <svg class="size-3.5 mr-2 text-ios-tertiary shrink-0" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 4a8 8 0 110 16H7a1 1 0 01-1-1V9a5 5 0 010-10h6zm1 10V8h-2v6h2zm0 4h-2v2h2v-2z"/>
+            </svg>
+            <span class="truncate">{{ v.name }}</span>
           </button>
         </div>
       </div>

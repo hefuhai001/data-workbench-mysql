@@ -41,32 +41,37 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
-  <div class="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
-    <div class="flex justify-between items-center">
-      <h3 class="font-semibold text-slate-700">SQL 控制台</h3>
-      <span class="text-xs text-slate-400">Ctrl+Enter 执行</span>
+  <div class="ios-card">
+    <div class="flex justify-between items-center px-4 h-12 border-b border-ios-sep">
+      <h3 class="text-[15px] font-semibold text-ios-label">SQL 控制台</h3>
+      <span class="text-xs text-ios-tertiary">Ctrl/⌘ + Enter 执行</span>
     </div>
-    <textarea
-      v-model="sql"
-      rows="6"
-      placeholder="SELECT * FROM your_table LIMIT 100;"
-      class="w-full border border-slate-300 rounded-lg p-3 font-mono text-sm outline-none focus:ring-2 focus:ring-blue-500 resize-y"
-    ></textarea>
-    <div class="flex gap-2 items-center">
-      <UiButton variant="primary" :disabled="loading" @click="run">{{ loading ? '执行中…' : '执行' }}</UiButton>
-      <span v-if="message" class="text-sm text-slate-500">{{ message }}</span>
+
+    <div class="p-4 space-y-3">
+      <textarea
+        v-model="sql"
+        rows="6"
+        placeholder="SELECT * FROM your_table LIMIT 100;"
+        class="w-full border border-ios-sep rounded-xl p-3.5 font-mono text-[13px] text-ios-label bg-ios-fill/60 outline-none focus:border-ios-blue focus:bg-white resize-y transition placeholder:text-ios-quaternary"
+      ></textarea>
+      <div class="flex gap-2 items-center">
+        <UiButton variant="primary" :disabled="loading" @click="run">{{ loading ? '执行中…' : '执行' }}</UiButton>
+        <span v-if="message" class="text-[13px] text-ios-secondary">{{ message }}</span>
+      </div>
+      <p v-if="err" class="text-[13px] text-ios-red whitespace-pre-wrap break-all">{{ err }}</p>
     </div>
-    <p v-if="err" class="text-sm text-red-600 whitespace-pre-wrap break-all">{{ err }}</p>
-    <div v-if="results.length" class="overflow-x-auto max-h-[60vh] overflow-y-auto">
-      <table class="w-full text-sm">
-        <thead class="sticky top-0">
-          <tr class="bg-slate-50 text-slate-600">
-            <th v-for="c in Object.keys(results[0])" :key="c" class="text-left px-3 py-2 font-medium border-b border-slate-200 whitespace-nowrap">{{ c }}</th>
+
+    <!-- 结果表格 -->
+    <div v-if="results.length" class="overflow-x-auto max-h-[58vh] overflow-y-auto border-t border-ios-sep">
+      <table class="w-full text-[13px] border-collapse">
+        <thead class="sticky top-0 z-10">
+          <tr class="bg-ios-fill/90 backdrop-blur-sm text-left">
+            <th v-for="c in Object.keys(results[0])" :key="c" class="px-3 py-2 font-semibold text-ios-tertiary text-xs uppercase tracking-wider whitespace-nowrap">{{ c }}</th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="(r, i) in results" :key="i" class="border-b border-slate-100 hover:bg-slate-50">
-            <td v-for="c in Object.keys(results[0])" :key="c" class="px-3 py-2 whitespace-nowrap">{{ r[c] }}</td>
+        <tbody class="bg-ios-card">
+          <tr v-for="(r, i) in results" :key="i" class="odd:bg-white even:bg-[#f9f9fb] hover:bg-blue-50/40 transition-colors">
+            <td v-for="c in Object.keys(results[0])" :key="c" class="px-3 py-2 text-ios-label whitespace-nowrap align-top">{{ r[c] }}</td>
           </tr>
         </tbody>
       </table>

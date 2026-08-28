@@ -27,20 +27,20 @@ const show = computed(() => ad.enabled && !dismissed.value)
 </script>
 
 <template>
-  <div v-if="show" class="px-4 pt-3">
-    <div class="mx-auto max-w-6xl flex items-center gap-3 rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50 to-sky-100 px-4 py-2.5">
-      <span class="shrink-0 rounded-md bg-blue-600 px-1.5 py-0.5 text-xs font-medium text-white">{{ ad.label }}</span>
+  <div v-if="show" class="px-4 pt-4">
+    <div class="mx-auto max-w-6xl flex items-center gap-2.5 rounded-xl border border-ios-blue/20 bg-gradient-to-r from-blue-50 via-sky-50 to-[#eaf3ff] px-4 py-2.5 shadow-sm">
+      <span class="shrink-0 rounded-md bg-ios-blue px-1.5 py-0.5 text-[11px] font-semibold text-white">{{ ad.label }}</span>
       <a
         :href="ad.link"
         target="_blank"
         rel="noopener"
-        class="flex min-w-0 flex-1 items-center gap-1.5 text-sm text-blue-900 hover:text-blue-700"
+        class="flex min-w-0 flex-1 items-center gap-1.5 text-sm text-blue-900 hover:text-ios-blue"
       >
         <span class="truncate">{{ ad.text }}</span>
-        <span class="shrink-0 text-blue-600">了解详情 →</span>
+        <span class="shrink-0 text-ios-blue font-medium">了解详情 →</span>
       </a>
       <button
-        class="shrink-0 rounded-md px-1 text-slate-400 hover:text-slate-600"
+        class="shrink-0 grid place-items-center size-6 rounded-full text-ios-tertiary hover:text-ios-secondary active:scale-95 transition"
         title="关闭"
         @click="dismiss"
       >✕</button>

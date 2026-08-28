@@ -137,59 +137,68 @@ watch(() => [props.database, props.table], refresh)
 </script>
 
 <template>
-  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-    <div class="flex justify-between items-center px-3 py-2 border-b border-slate-200">
-      <h3 class="font-semibold text-slate-700">数据 · {{ table }}</h3>
-      <div class="flex items-center gap-3 text-xs text-slate-500">
-        <span>共 {{ total }} 行</span>
-        <button
+  <div class="ios-card">
+    <!-- 标题栏 -->
+    <div class="flex justify-between items-center px-4 h-12 border-b border-ios-sep">
+      <h3 class="text-[15px] font-semibold text-ios-label truncate">数据</h3>
+      <div class="flex items-center gap-2.5 shrink-0">
+        <span class="text-xs text-ios-secondary whitespace-nowrap">共 {{ total }} 行</span>
+        <UiButton
           v-if="hasPk"
-          class="px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+          variant="primary"
+          size="sm"
           @click="openAdd"
-        >新增行</button>
+        >＋ 新增行</UiButton>
       </div>
     </div>
-    <p v-if="error" class="px-3 py-2 text-sm text-red-600 bg-red-50 border-b border-red-200">{{ error }}</p>
-    <div class="p-2">
+
+    <p v-if="error" class="px-4 py-2.5 text-[13px] text-ios-red bg-red-50 border-b border-red-100">{{ error }}</p>
+
+    <!-- 筛选输入 -->
+    <div class="px-4 py-3">
       <input
         v-model="where"
-        placeholder="WHERE 条件(可选材料，如 id > 100)，回车查询"
-        class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="WHERE 条件（如 id > 100），回车查询"
+        class="ios-input text-sm"
         @keyup.enter="page = 1; load()"
       />
     </div>
-    <div class="text-xs px-3 pb-1 text-slate-400">
+    <div class="px-4 pb-1 text-xs text-ios-tertiary">
       <template v-if="!hasPk">该表无主键，仅支持只读与新增。</template>
-      <template v-else>主键：{{ schema.primaryKey.join(', ') }}；支持新增/编辑/删除。</template>
+      <template v-else>主键：{{ schema.primaryKey.join(', ') }} · 支持新增/编辑/删除</template>
     </div>
-    <div class="overflow-x-auto max-h-[60vh] overflow-y-auto">
-      <p v-if="loading" class="p-4 text-sm text-slate-400">加载中…</p>
-      <p v-else-if="!rows.length" class="p-4 text-sm text-slate-400">无数据。</p>
-      <table v-else class="w-full text-sm">
-        <thead class="sticky top-0">
-          <tr class="bg-slate-50 text-slate-600">
-            <th class="px-3 py-2 font-medium border-b border-slate-200">操作</th>
-            <th v-for="c in cols" :key="c" class="text-left px-3 py-2 font-medium whitespace-nowrap border-b border-slate-200">{{ c }}</th>
+
+    <!-- 表格 -->
+    <div class="overflow-x-auto max-h-[58vh] overflow-y-auto">
+      <p v-if="loading" class="p-6 text-sm text-ios-tertiary text-center">加载中…</p>
+      <p v-else-if="!rows.length" class="p-6 text-sm text-ios-tertiary text-center">无数据。</p>
+      <table v-else class="w-full text-[13px] border-collapse">
+        <thead class="sticky top-0 z-10">
+          <tr class="bg-ios-fill/90 backdrop-blur-sm text-left">
+            <th class="px-3 py-2 font-semibold text-ios-tertiary text-xs uppercase tracking-wider whitespace-nowrap">操作</th>
+            <th v-for="c in cols" :key="c" class="px-3 py-2 font-semibold text-ios-tertiary text-xs uppercase tracking-wider whitespace-nowrap">{{ c }}</th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="(r, i) in rows" :key="i" class="border-b border-slate-100 hover:bg-slate-50">
+        <tbody class="bg-ios-card">
+          <tr v-for="(r, i) in rows" :key="i" class="odd:bg-white even:bg-[#f9f9fb] hover:bg-blue-50/40 transition-colors">
             <td class="px-3 py-2 whitespace-nowrap">
               <template v-if="hasPk">
-                <button class="text-blue-600 hover:underline mr-2" @click="openEdit(r, i)">编辑</button>
-                <button class="text-red-600 hover:underline" @click="removeRow(r)">删除</button>
+                <button class="text-ios-blue font-medium hover:underline mr-3" @click="openEdit(r, i)">编辑</button>
+                <button class="text-ios-red font-medium hover:underline" @click="removeRow(r)">删除</button>
               </template>
-              <span v-else class="text-slate-300">—</span>
+              <span v-else class="text-ios-quaternary">—</span>
             </td>
-            <td v-for="c in cols" :key="c" class="px-3 py-2 text-slate-700 whitespace-nowrap">{{ r[c] }}</td>
+            <td v-for="c in cols" :key="c" class="px-3 py-2 text-ios-label whitespace-nowrap align-top">{{ r[c] }}</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="flex justify-between items-center px-3 py-2 border-t border-slate-200">
-      <button :disabled="page <= 1" @click="prev" class="px-3 py-1 rounded border disabled:opacity-40 text-sm">上一页</button>
-      <span class="text-sm text-slate-600">{{ page }} / {{ pageCount() }}</span>
-      <button :disabled="page >= pageCount()" @click="next" class="px-3 py-1 rounded border disabled:opacity-40 text-sm">下一页</button>
+
+    <!-- 分页 -->
+    <div class="flex justify-between items-center px-4 h-12 border-t border-ios-sep">
+      <UiButton variant="soft" size="sm" :disabled="page <= 1" @click="prev">上一页</UiButton>
+      <span class="text-[13px] text-ios-secondary">{{ page }} / {{ pageCount() }}</span>
+      <UiButton variant="soft" size="sm" :disabled="page >= pageCount()" @click="next">下一页</UiButton>
     </div>
   </div>
 
@@ -202,7 +211,7 @@ watch(() => [props.database, props.table], refresh)
         v-model="form[c.columnName]"
       />
     </div>
-    <p v-if="formError" class="mt-2 text-sm text-red-600">{{ formError }}</p>
+    <p v-if="formError" class="mt-2 text-sm text-ios-red">{{ formError }}</p>
     <div class="flex justify-end gap-2 mt-4">
       <UiButton @click="showAdd = false">取消</UiButton>
       <UiButton variant="primary" :disabled="saving" @click="confirmAdd">{{ saving ? '保存中…' : '保存' }}</UiButton>
@@ -218,7 +227,7 @@ watch(() => [props.database, props.table], refresh)
         v-model="form[c.columnName]"
       />
     </div>
-    <p v-if="formError" class="mt-2 text-sm text-red-600">{{ formError }}</p>
+    <p v-if="formError" class="mt-2 text-sm text-ios-red">{{ formError }}</p>
     <div class="flex justify-end gap-2 mt-4">
       <UiButton @click="showEdit = false">取消</UiButton>
       <UiButton variant="primary" :disabled="saving" @click="confirmEdit">{{ saving ? '保存中…' : '保存' }}</UiButton>

@@ -8,8 +8,8 @@ const footer = {
 </script>
 
 <template>
-  <footer class="mt-8 border-t border-slate-200 px-4 py-4">
-    <div class="mx-auto max-w-6xl text-center text-xs text-slate-400">
+  <footer class="mt-6 border-t border-black/5 px-4 py-5">
+    <div class="mx-auto max-w-6xl text-center text-xs text-ios-tertiary">
       <p>© {{ footer.year }} {{ footer.company }}</p>
       <p class="mt-1">{{ footer.icp }}</p>
     </div>
