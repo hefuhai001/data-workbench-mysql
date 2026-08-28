@@ -19,6 +19,9 @@ function onSelectTable(t: { database: string; name: string }) {
       </nav>
     </header>
 
+    <!-- 顶部通栏广告位 -->
+    <AdBanner />
+
     <main class="flex-1 p-4 max-w-6xl w-full mx-auto">
       <div v-if="activeTab === 'conn'">
         <ConnectionPanel @changed="showConnPanel = !showConnPanel" />
@@ -32,5 +35,8 @@ function onSelectTable(t: { database: string; name: string }) {
         <SqlConsole />
       </div>
     </main>
+
+    <!-- 页脚版权与备案 -->
+    <AppFooter />
   </div>
 </template>
