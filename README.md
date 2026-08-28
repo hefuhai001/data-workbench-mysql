@@ -2,6 +2,15 @@
 
 一款基于 **Nuxt 4** 构建的本地单机 MySQL 管理工具，提供 Web 图形界面进行数据库日常管理操作。
 
+## 界面预览
+
+<p align="center">
+  <img src="public/screenshot-desktop.png" alt="桌面端界面" width="70%" />
+</p>
+<p align="center">
+  <img src="public/screenshot-mobile.png" alt="移动端界面" width="25%" />
+</p>
+
 ## 功能特性
 
 - **主密码保护** — 首次使用需设置主密码，MySQL 连接密码经 **PBKDF2 + AES-256-GCM** 加密存储，仅进程内存中持有明文密钥
@@ -182,3 +191,15 @@ npx nuxi typecheck
 # 构建
 pnpm build
 ```
+
+## ☕ 捐赠支持
+
+如果这个项目对你有帮助，请我喝杯奶茶吧～你的支持是我持续维护的动力！
+
+<p align="center">
+  <img src="public/donation-qr.jpg" alt="捐赠二维码" width="240" />
+</p>
+
+## License
+
+内部项目，仅供学习交流使用。
