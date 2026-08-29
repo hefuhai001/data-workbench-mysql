@@ -11,9 +11,17 @@ export default defineEventHandler(async (event) => {
     target.database = database
     const conn = await openMysql(target)
     try {
-      const setSql = Object.keys(row).map(k => `\`${esc(k)}\` = ?`).join(', ')
+      // 时间戳自动维护：updated_at 为空时自动刷新为当前时间；created_at 为空则不写库（保留原创建时间）。
+      // 其余空串列也跳过，避免把 NULL 显示为空串后回写覆盖成 NULL
+      const upd: Record<string, any> = { ...row }
+      if ('updated_at' in upd && !upd.updated_at) upd.updated_at = new Date()
+      const setKeys = Object.keys(upd).filter(k => upd[k] !== '')
+      if (setKeys.length === 0) {
+        return { ok: true }
+      }
+      const setSql = setKeys.map(k => `\`${esc(k)}\` = ?`).join(', ')
       const whereSql = idCols.map(k => `\`${esc(k)}\` = ?`).join(' AND ')
-      await conn.query(`UPDATE \`${safeTable}\` SET ${setSql} WHERE ${whereSql}`, [...Object.values(row), ...idVals])
+      await conn.query(`UPDATE \`${safeTable}\` SET ${setSql} WHERE ${whereSql}`, [...setKeys.map(k => upd[k]), ...idVals])
       return { ok: true }
     } finally { conn.end().catch(() => {}) }
   } catch (e: any) {

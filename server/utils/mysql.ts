@@ -16,7 +16,11 @@ export async function openMysql(cfg: MysqlTarget): Promise<Connection> {
     password: cfg.password,
     database: cfg.database || undefined,
     connectTimeout: 8000,
-    multipleStatements: true
+    multipleStatements: true,
+    // 避免 BIGINT 超安全整数(2^53)时丢失精度：BEIGINT/DECIMAL 一律返回字符串，
+    // 保证超长主键（如雪花 id）能被精确读取并用于 UPDATE/DELETE 的 WHERE 定位
+    supportBigNumbers: true,
+    bigNumberStrings: true
   })
 }
 
