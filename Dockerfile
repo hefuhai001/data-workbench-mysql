@@ -32,8 +32,14 @@ ENV HOST=0.0.0.0
 # 拷贝 Nuxt/Nitro 构建产物
 COPY --from=builder /app/.output ./.output
 
-# 非 root 运行
-USER node
+# su-exec：供入口脚本以 root 修正 /app/.data 属主后降权到 node 用户运行
+RUN apk add --no-cache su-exec
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# 入口脚本负责确保 /app/.data 可写（兼容 bind 挂载 / named volume / 历史遗留卷）并降权到 node，
+# 因此不再设置 USER node（须以 root 启动才能 chown）
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 3000
 

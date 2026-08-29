@@ -2,8 +2,12 @@ import Database from 'better-sqlite3'
 import path from 'node:path'
 import fs from 'node:fs'
 
-const dataDir = path.resolve(process.cwd(), '.data')
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true })
+const dataDir = process.env.DATA_DIR || path.resolve(process.cwd(), '.data')
+try {
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true })
+} catch (e) {
+  throw new Error(`无法创建数据目录 ${dataDir}，请确认容器用户有写权限（可设置 DATA_DIR 环境变量重定向）：${e instanceof Error ? e.message : String(e)}`)
+}
 const dbPath = path.join(dataDir, 'workbench.db')
 
 const db = new Database(dbPath)
