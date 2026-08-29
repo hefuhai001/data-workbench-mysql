@@ -264,6 +264,35 @@ export function useWorkbench() {
     }
   }
 
+  // ---- tag 批量关闭：关闭左侧 / 右侧 / 其他 / 全部 ----
+  function closeLeft(key: string) {
+    const idx = tabs.value.findIndex(t => t.key === key)
+    if (idx <= 0) return
+    const closed = tabs.value.slice(0, idx).map(t => t.key)
+    tabs.value = tabs.value.slice(idx)
+    // 当前激活项在左侧被关闭时，激活右键的那个 tag
+    if (closed.includes(activeKey.value)) activateKey(key)
+  }
+
+  function closeRight(key: string) {
+    const idx = tabs.value.findIndex(t => t.key === key)
+    if (idx < 0 || idx === tabs.value.length - 1) return
+    tabs.value = tabs.value.slice(0, idx + 1)
+    // 当前激活项在右侧被关闭时，回退到右键的那个 tag
+    if (!tabs.value.some(t => t.key === activeKey.value)) activateKey(key)
+  }
+
+  function closeOthers(key: string) {
+    if (!tabs.value.some(t => t.key === key)) return
+    tabs.value = tabs.value.filter(t => t.key === key)
+    activateKey(key)
+  }
+
+  function closeAll() {
+    tabs.value = []
+    activeKey.value = ''
+  }
+
   function openSql() {
     if (!tabs.value.some(t => t.key === 'sql')) {
       tabs.value.push({ key: 'sql', type: 'sql', label: 'SQL 控制台' })
@@ -311,7 +340,8 @@ export function useWorkbench() {
 
   return {
     tree, tabs, activeKey, sidebarOpen, treeLoading, notes, saveNote,
-    init, loadTree, findNode, toggleNode, selectNode, activateKey, closeTab, openSql,
+    init, loadTree, findNode, toggleNode, selectNode, activateKey, closeTab,
+    closeLeft, closeRight, closeOthers, closeAll, openSql,
     emptyConnectionForm, saveConnection, deleteConnection, testConnection
   }
 }

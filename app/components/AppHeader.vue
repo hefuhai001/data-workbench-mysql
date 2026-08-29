@@ -1,6 +1,7 @@
 <script setup lang="ts">
-// 顶部导航栏：品牌区 + 第二行展示点击生成的 tag 标签（可点击切换/关闭，滚轮可横向滚动）
-const { tabs, activeKey, activateKey, closeTab, sidebarOpen } = useWorkbench()
+// 顶部导航栏：品牌区 + 第二行展示点击生成的 tag 标签（可点击切换/关闭，滚轮可横向滚动）。
+// tag 上右键弹出菜单：关闭左侧 / 关闭右侧 / 关闭其他 / 关闭全部。
+const { tabs, activeKey, activateKey, closeTab, closeLeft, closeRight, closeOthers, closeAll, sidebarOpen } = useWorkbench()
 const { canInstall, installed, install } = usePwaInstall()
 
 const tagRef = ref<HTMLElement | null>(null)
@@ -13,6 +14,23 @@ function onTagWheel(e: WheelEvent) {
     el.scrollLeft += e.deltaY
     e.preventDefault()
   }
+}
+
+// ---- tag 右键菜单 ----
+const ctxMenu = ref<{ key: string; x: number; y: number } | null>(null)
+
+function onTagContextMenu(e: MouseEvent, key: string) {
+  e.preventDefault()
+  // 限制在视口内，避免菜单溢出屏幕
+  const x = Math.min(e.clientX, window.innerWidth - 160)
+  const y = Math.min(e.clientY, window.innerHeight - 190)
+  ctxMenu.value = { key, x, y }
+}
+
+function ctxAction(fn: (key: string) => void) {
+  const key = ctxMenu.value?.key
+  if (key) fn(key)
+  ctxMenu.value = null
 }
 </script>
 
@@ -71,6 +89,8 @@ function onTagWheel(e: WheelEvent) {
         class="tag"
         :class="activeKey === t.key && 'active'"
         @click="activateKey(t.key)"
+        @contextmenu.prevent="onTagContextMenu($event, t.key)"
+        @dblclick.prevent="onTagContextMenu($event, t.key)"
       >
         <!-- 类型图标 -->
         <svg v-if="t.type === 'connection'" class="size-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -91,6 +111,20 @@ function onTagWheel(e: WheelEvent) {
         <span class="tag-close" title="关闭" @click.stop="closeTab(t.key)">✕</span>
       </button>
     </div>
+
+    <!-- tag 右键菜单（Teleport 到 body，避免被 overflow 裁切） -->
+    <Teleport to="body">
+      <div v-if="ctxMenu" class="fixed inset-0 z-50"
+        @click="ctxMenu = null" @contextmenu.prevent="ctxMenu = null">
+        <div class="fixed w-36 rounded-xl border border-ios-sep bg-white shadow-xl overflow-hidden py-1"
+          :style="{ left: ctxMenu.x + 'px', top: ctxMenu.y + 'px' }">
+          <button class="menu-item" @click.stop="ctxAction(closeLeft)">关闭左侧</button>
+          <button class="menu-item" @click.stop="ctxAction(closeRight)">关闭右侧</button>
+          <button class="menu-item" @click.stop="ctxAction(closeOthers)">关闭其他</button>
+          <button class="menu-item menu-item-danger" @click.stop="ctxAction(() => closeAll())">关闭全部</button>
+        </div>
+      </div>
+    </Teleport>
   </header>
 </template>
 
@@ -110,6 +144,8 @@ function onTagWheel(e: WheelEvent) {
   color: var(--color-ios-secondary);
   border: 1px solid transparent;
   transition: background-color 0.12s, color 0.12s;
+  /* 移动端双击弹出菜单时禁止触发浏览器双击缩放 */
+  touch-action: manipulation;
 }
 .tag:hover {
   background-color: var(--color-ios-fill);
@@ -136,5 +172,20 @@ function onTagWheel(e: WheelEvent) {
 }
 .tag.active .tag-close:hover {
   background-color: rgba(255, 255, 255, 0.25);
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--color-ios-label);
+}
+.menu-item:hover {
+  background-color: var(--color-ios-fill);
+}
+.menu-item-danger {
+  color: var(--color-ios-red);
 }
 </style>
