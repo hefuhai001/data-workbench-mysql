@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{ database: string; table: string; connectionId?: string; title?: string }>()
 const api = useApi()
+const { downloading: exporting, download: exportRows } = useExport()
 
 const rows = ref<any[]>([])
 const cols = ref<string[]>([])
@@ -11,6 +12,7 @@ const where = ref('')
 const loading = ref(false)
 const error = ref('')
 const saving = ref(false)
+const showStructure = ref(false)
 
 // 表元数据：列定义 + 复合主键
 const schema = ref<{ columns: any[]; primaryKey: string[] }>({ columns: [], primaryKey: [] })
@@ -79,6 +81,16 @@ function prev() { if (page.value > 1) { page.value--; load() } }
 function next() { if (page.value < pageCount()) { page.value++; load() } }
 
 function refresh() { loadSchema(); load() }
+
+// 导出当前表（含筛选条件）为 CSV
+function doExport() {
+  exportRows({
+    database: props.database,
+    table: props.table,
+    where: where.value.trim() || undefined,
+    connectionId: props.connectionId
+  })
+}
 
 // ---- 新增 ----
 function openAdd() {
@@ -157,6 +169,17 @@ watch(() => [props.database, props.table, props.connectionId], refresh)
       <div class="flex items-center gap-2.5 shrink-0">
         <span class="text-xs text-ios-secondary whitespace-nowrap">共 {{ total }} 行</span>
         <UiButton
+          variant="soft"
+          size="sm"
+          @click="showStructure = true"
+        >结构</UiButton>
+        <UiButton
+          variant="soft"
+          size="sm"
+          :disabled="exporting || !rows.length"
+          @click="doExport"
+        >{{ exporting ? '导出中…' : '导出' }}</UiButton>
+        <UiButton
           v-if="hasPk"
           variant="primary"
           size="sm"
@@ -214,6 +237,14 @@ watch(() => [props.database, props.table, props.connectionId], refresh)
       <UiButton variant="soft" size="sm" :disabled="page >= pageCount()" @click="next">下一页</UiButton>
     </div>
   </div>
+
+  <TableStructure
+    v-if="showStructure"
+    :database="database"
+    :table="table"
+    :connection-id="connectionId"
+    @close="showStructure = false"
+  />
 
   <UiModal v-if="showAdd" title="新增行" @close="showAdd = false">
     <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">

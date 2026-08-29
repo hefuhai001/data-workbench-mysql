@@ -11,11 +11,30 @@ export default defineEventHandler(async (event) => {
     const conn = await openMysql(target)
     try {
       const [cols] = await conn.query(
-        `SELECT column_name AS columnName, data_type AS dataType, column_key AS columnKey, is_nullable AS isNullable, column_default AS columnDefault, extra FROM information_schema.columns WHERE table_schema = ? AND table_name = ? ORDER BY ordinal_position`,
+        `SELECT column_name AS columnName, column_type AS columnType, data_type AS dataType,
+                column_key AS columnKey, is_nullable AS isNullable, column_default AS columnDefault, extra
+         FROM information_schema.columns WHERE table_schema = ? AND table_name = ? ORDER BY ordinal_position`,
         [database, table]
       )
+      const [indexes] = await conn.query(`SHOW INDEX FROM \`${esc(table)}\``)
+      const [foreignKeys] = await conn.query(
+        `SELECT kcu.column_name AS columnName, kcu.referenced_table_name AS refTable,
+                kcu.referenced_column_name AS refColumn, kcu.constraint_name AS constraintName
+         FROM information_schema.key_column_usage kcu
+         WHERE kcu.table_schema = ? AND kcu.table_name = ? AND kcu.referenced_table_name IS NOT NULL
+         ORDER BY kcu.ordinal_position`,
+        [database, table]
+      )
+      const [ddlRows] = await conn.query(`SHOW CREATE TABLE \`${esc(table)}\``)
+      const ddlRow = (ddlRows as any)[0]
       const primaryKey = (cols as any[]).filter(c => c.columnKey === 'PRI').map(c => c.columnName)
-      return { columns: cols, primaryKey }
+      return {
+        columns: cols,
+        primaryKey,
+        indexes,
+        foreignKeys,
+        ddl: ddlRow ? (ddlRow as any)['Create Table'] || '' : ''
+      }
     } finally { conn.end().catch(() => {}) }
   } catch (e: any) {
     throw createError({ statusCode: e?.statusCode ?? (e?.errno !== undefined ? 400 : 500), statusMessage: e?.sqlMessage || e?.message || String(e) })
